@@ -14,37 +14,36 @@ import java.util.concurrent.atomic.AtomicLong;
  *
  * @author Evgeniy Surovskiy
  */
-@State(Scope.Benchmark)
 public class TestAtomicLong
 {
-    AtomicLong value = new AtomicLong(0l);
+    @State(Scope.Benchmark)
+    public static class AtomicLongWrapper
+    {
+        public AtomicLong value = new AtomicLong(0l);
+    }
 
     @Benchmark
     @BenchmarkMode(Mode.SingleShotTime)
     @OutputTimeUnit(TimeUnit.MILLISECONDS)
-    public Long incrementAtomicLoop()
+    public Long incrementAtomicLoop(final AtomicLongWrapper atomicLongWrapper)
     {
         for(int i = 0; i < 1_000_000; i++)
         {
-            value.incrementAndGet();
+            atomicLongWrapper.value.incrementAndGet();
         }
-        return value.get();
+        return atomicLongWrapper.value.get();
     }
 
     public static void main(String[] args) throws RunnerException
     {
-
         Options opt = new OptionsBuilder()
                 .include(TestAtomicLong.class.getSimpleName())
                 .jvmArgs("-server", "-Xmx2G")
                 .warmupIterations(10)
                 .measurementIterations(50)
                 .forks(1)
-                .threads(64)
+                .threads(16)
                 .build();
         new Runner(opt).run();
-
     }
-
-
 }
