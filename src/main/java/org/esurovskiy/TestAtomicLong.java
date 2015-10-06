@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class TestAtomicLong
 {
-    public static final int[] threadsCountArray = new int[]{ 16, };
+    public static final int[] threadsCountArray = new int[]{1, 2, 4, 8, 16, 32, 48, 64};
 
     @State(Scope.Benchmark)
     public static class AtomicLongWrapper
