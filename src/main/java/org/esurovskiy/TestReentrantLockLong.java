@@ -7,24 +7,32 @@ import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * TODO: write JavaDoc
  *
  * @author Evgeniy Surovskiy
  */
-public class TestSynchronizedLong
+public class TestReentrantLockLong
 {
     public static final int[] threadsCountArray = new int[]{1, 2, 4, 8, 16, 32, 48, 64};
-
     @State(Scope.Benchmark)
     public static class LongWrapper
     {
+        ReentrantLock lock = new ReentrantLock(true);
         volatile Long value = 0l;
-
-        synchronized Long incrementAndGet()
+        Long incrementAndGet()
         {
-            return ++value;
+            lock.lock();
+            try
+            {
+                return ++value;
+            }
+            finally
+            {
+                lock.unlock();
+            }
         }
 
         Long get()
@@ -51,7 +59,7 @@ public class TestSynchronizedLong
         for(final int threadsCount : threadsCountArray)
         {
             Options opt = new OptionsBuilder()
-                    .include(TestSynchronizedLong.class.getSimpleName())
+                    .include(TestReentrantLockLong.class.getSimpleName())
                     .jvmArgs("-server", "-Xmx2G")
                     .warmupIterations(10)
                     .measurementIterations(25)
