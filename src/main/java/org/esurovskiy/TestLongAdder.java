@@ -7,42 +7,33 @@ import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.LongAdder;
 
 /**
  * TODO: write JavaDoc
  *
  * @author Evgeniy Surovskiy
  */
-public class TestSynchronizedLong
+public class TestLongAdder
 {
     public static final int[] threadsCountArray = new int[]{1, 2, 4, 8, 16, 32, 48, 64};
 
     @State(Scope.Benchmark)
-    public static class LongWrapper
+    public static class LongAdderWrapper
     {
-        volatile Long value = 0l;
-
-        synchronized Long incrementAndGet()
-        {
-            return ++value;
-        }
-
-        Long get()
-        {
-            return value;
-        }
+        public LongAdder value = new LongAdder();
     }
 
     @Benchmark
     @BenchmarkMode(Mode.SingleShotTime)
     @OutputTimeUnit(TimeUnit.MILLISECONDS)
-    public Long incrementAtomicLoop(final LongWrapper longWrapper)
+    public Long incrementAtomicLoop(final LongAdderWrapper longAdderWrapper)
     {
         for(int i = 0; i < 1_000_000; i++)
         {
-            longWrapper.incrementAndGet();
+            longAdderWrapper.value.increment();
         }
-        return longWrapper.get();
+        return longAdderWrapper.value.longValue();
     }
 
     public static void main(String[] args) throws RunnerException
@@ -50,7 +41,7 @@ public class TestSynchronizedLong
         for(final int threadsCount : threadsCountArray)
         {
             Options opt = new OptionsBuilder()
-                    .include(TestSynchronizedLong.class.getSimpleName())
+                    .include(TestLongAdder.class.getSimpleName())
                     .jvmArgs("-server", "-Xmx2G")
                     .warmupIterations(10)
                     .measurementIterations(25)

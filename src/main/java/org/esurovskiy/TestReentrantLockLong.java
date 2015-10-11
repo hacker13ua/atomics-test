@@ -50,7 +50,6 @@ public class TestReentrantLockLong
         {
             longWrapper.incrementAndGet();
         }
-        System.out.println("Value=" + longWrapper.get());
         return longWrapper.get();
     }
 
