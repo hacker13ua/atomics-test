@@ -13,21 +13,21 @@ import java.util.concurrent.TimeUnit;
  *
  * @author Evgeniy Surovskiy
  */
-public class TestSynchronizedLong
+public class TestPurePerformance
 {
     public static final int[] threadsCountArray = new int[]{1, 2, 4, 8, 16, 32, 48, 64};
 
     @State(Scope.Benchmark)
     public static class LongWrapper
     {
-        volatile long value = 0l;
+        long value = 0l;
 
-        synchronized Long incrementAndGet()
+        long incrementAndGet()
         {
             return ++value;
         }
 
-        Long get()
+        long get()
         {
             return value;
         }
@@ -42,6 +42,7 @@ public class TestSynchronizedLong
         {
             longWrapper.incrementAndGet();
         }
+        System.out.println("Value Pure Performance=" + longWrapper.get());
         return longWrapper.get();
     }
 
@@ -50,7 +51,7 @@ public class TestSynchronizedLong
         for(final int threadsCount : threadsCountArray)
         {
             Options opt = new OptionsBuilder()
-                    .include(TestSynchronizedLong.class.getSimpleName())
+                    .include(TestPurePerformance.class.getSimpleName())
                     .jvmArgs("-server", "-Xmx2G")
                     .warmupIterations(10)
                     .measurementIterations(25)

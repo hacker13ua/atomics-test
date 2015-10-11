@@ -20,8 +20,8 @@ public class TestReentrantLockLong
     @State(Scope.Benchmark)
     public static class LongWrapper
     {
-        ReentrantLock lock = new ReentrantLock(true);
-        volatile Long value = 0l;
+        ReentrantLock lock = new ReentrantLock(false);
+        volatile long value = 0l;
         Long incrementAndGet()
         {
             lock.lock();
